@@ -23,9 +23,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-yvn(rav8e%c+-*6w-4rlfw^x$of@h87ri!9#!f6+@rk729jo#g'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
 
-ALLOWED_HOSTS = []
+
+#moi
+ALLOWED_HOSTS = [
+    "Robine.pythonanywhere.com",
+    "localhost",
+    "127.0.0.1"
+]
+
+
 
 
 # Application definition
@@ -117,8 +124,11 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = 'static/'
+#moi
+STATIC_URL = '/static/'
 
+#moi
+STATIC_ROOT = BASE_DIR / "staticfiles"
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
@@ -165,8 +175,20 @@ EMAIL_PORT = 587
 # Activation du mode TLS (sécurité)
 EMAIL_USE_TLS = True
 
-# Ton adresse email (UTILISE LA TIENNE)
-EMAIL_HOST_USER = 'tanmirobine6@gmail.com'
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / "media"
 
-# Mot de passe d'application Gmail (pas ton vrai mot de passe)
-EMAIL_HOST_PASSWORD = 'brlb lpug kxcs dftt'
+
+from decouple import config
+
+# 🔐 clé secrète Django
+SECRET_KEY = config("SECRET_KEY")
+
+# 🐞 mode debug
+DEBUG = config("DEBUG", cast=bool)
+
+# 📧 email utilisé pour envoyer OTP
+EMAIL_HOST_USER = config("EMAIL_HOST_USER")
+
+# 🔑 mot de passe d'application Gmail
+EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD")

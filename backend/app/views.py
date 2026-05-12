@@ -3,7 +3,10 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth import get_user_model
 from django.http import FileResponse
-import os
+from django.db.models import Count, Sum
+from django.db.models.functions import TruncDate, TruncMonth
+from django.utils import timezone
+
 
 from app.services.citizen_service import CitizenService
 from app.services.otp_service import OTPService
@@ -545,7 +548,7 @@ class DownloadCertificateView(generics.GenericAPIView):
             as_attachment=True,
             filename="acte_certifie.pdf"
         )    
-    
+ #VERIFIER L'AUTHENTICITE D'UN ACTE   
 class VerifyCertificateView(generics.GenericAPIView):
     """
     Endpoint public de vérification de certificat via QR code
@@ -579,4 +582,126 @@ class VerifyCertificateView(generics.GenericAPIView):
                 "commune": cert.commune.name,
                 "date": cert.created_at
             }
-        })    
+        })   
+
+#TABLEAU DE BORD DES MAIRIE
+class MairieDashboardView(generics.GenericAPIView):
+    """
+    Dashboard des statistiques pour une mairie
+    """
+
+    def get(self, request):
+
+        commune = request.user.commune
+
+        # 🔹 résumé
+        total = Certification.objects.filter(commune=commune).count()
+
+        total_revenue = Certification.objects.filter(
+            commune=commune,
+            status="CERTIFIED"
+        ).aggregate(total=Sum("amount"))["total"] or 0
+
+        today = Certification.objects.filter(
+            commune=commune,
+            created_at__date=timezone.now().date()
+        ).count()
+
+        # 🔥 GRAPHE 1 → PAR JOUR
+        daily_evolution = (
+            Certification.objects
+            .filter(commune=commune)
+            .annotate(day=TruncDate("created_at"))
+            .values("day")
+            .annotate(count=Count("id"))
+            .order_by("day")
+        )
+
+        # 🔥 GRAPHE 2 → PAR MOIS
+        monthly_evolution = (
+            Certification.objects
+            .filter(commune=commune)
+            .annotate(month=TruncMonth("created_at"))
+            .values("month")
+            .annotate(count=Count("id"))
+            .order_by("month")
+        )
+
+        return Response({
+            "summary": {
+                "total_certifications": total,
+                "today_certifications": today,
+                "total_revenue": total_revenue
+            },
+            "charts": {
+                "daily": list(daily_evolution),
+                "monthly": list(monthly_evolution)
+            }
+        })
+    
+
+#TABLEAU DE BORD DE LA BUNEC
+class BunecDashboardView(generics.GenericAPIView):
+    """
+    Dashboard national BUNEC
+    """
+
+    def get(self, request):
+
+        # 🔹 total national
+        total = Certification.objects.count()
+
+        # 🔹 revenus nationaux
+        total_revenue = Certification.objects.filter(
+            status="CERTIFIED"
+        ).aggregate(total=Sum("amount"))["total"] or 0
+
+        # 🔹 aujourd’hui
+        today = Certification.objects.filter(
+            created_at__date=timezone.now().date()
+        ).count()
+
+        # 🔥 GRAPHE 1 → JOURNALIER (national)
+        daily = (
+            Certification.objects
+            .annotate(day=TruncDate("created_at"))
+            .values("day")
+            .annotate(count=Count("id"))
+            .order_by("day")
+        )
+
+        # 🔥 GRAPHE 2 → MENSUEL (national)
+        monthly = (
+            Certification.objects
+            .annotate(month=TruncMonth("created_at"))
+            .values("month")
+            .annotate(count=Count("id"))
+            .order_by("month")
+        )
+
+        # 🏛️ répartition par mairie (commune)
+        by_commune = (
+            Certification.objects
+            .values("commune__name")
+            .annotate(count=Count("id"))
+            .order_by("-count")
+        )
+
+        # 🏆 top 5 mairies
+        top_communes = list(by_commune[:5])
+
+        return Response({
+            "summary": {
+                "total_certifications": total,
+                "today_certifications": today,
+                "total_revenue": total_revenue
+            },
+            "charts": {
+                "daily": list(daily),
+                "monthly": list(monthly)
+            },
+            "communes": {
+                "distribution": list(by_commune),
+                "top": top_communes
+            }
+        })

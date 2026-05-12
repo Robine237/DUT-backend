@@ -5,7 +5,7 @@ from app.views import (
     BirthActDeleteView,RegionListView,DepartmentByRegionView,CommuneByDepartmentView,  #CitizenTestDashboardView, MairieTestDashboardView
     RegionCreateView,DepartmentCreateView,CommuneCreateView,InitCitizenLoginView, VerifyOTPView,
     GenerateCertificateView,CreateCertificationView,PaymentView,CalculatePriceView,
-    DownloadCertificateView,VerifyCertificateView
+    DownloadCertificateView,VerifyCertificateView,MairieDashboardView
 )
 
 
@@ -35,5 +35,8 @@ urlpatterns = [
     path("certifications/<int:pk>/pay/", PaymentView.as_view()),
     path("certifications/<int:pk>/generate/", GenerateCertificateView.as_view()),
     path("certifications/<int:pk>/download/",DownloadCertificateView.as_view(),name="download-certificate"),
+
     path("verify/<uuid:code>/", VerifyCertificateView.as_view()),
+
+    path("dashboard/mairie/", MairieDashboardView.as_view()),
 ]
