@@ -20,7 +20,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-yvn(rav8e%c+-*6w-4rlfw^x$of@h87ri!9#!f6+@rk729jo#g'
+
+
 
 # SECURITY WARNING: don't run with debug turned on in production!
 
@@ -82,12 +83,12 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-#DATABASES = {
-   # 'default': {
-        #'ENGINE': 'django.db.backends.sqlite3',
-        #'NAME': BASE_DIR / 'db.sqlite3',
-   # }
-#}
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
+}
 
 
 # Password validation
@@ -152,16 +153,16 @@ SIMPLE_JWT = {
 }
 
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'etat_civil_db',
-        'USER': 'postgres',
-        'PASSWORD': 'postgrey2026',
-        'HOST': 'localhost',
-        'PORT': '5432',
-    }
-}
+ #DATABASES = {
+   # 'default': {
+        #'ENGINE': 'django.db.backends.postgresql',
+        #'NAME': 'etat_civil_db',
+        #'USER': 'postgres',
+        #'PASSWORD': 'postgrey2026',
+        #'HOST': 'localhost',
+        #'PORT': '5432',
+    #}
+#}
 
 # Configuration du backend email (SMTP)
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
