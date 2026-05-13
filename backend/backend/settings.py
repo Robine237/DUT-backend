@@ -28,8 +28,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 #moi
 ALLOWED_HOSTS = [
-    "Robine.pythonanywhere.com",
-    "localhost"
+    "Robine.pythonanywhere.com"
+   
     
 ]
 
